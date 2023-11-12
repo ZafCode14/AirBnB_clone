@@ -82,13 +82,19 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, line) -> None:
         """ Prints all string representation of all instances """
         str_lst = []
+        line_arg = line.split()
         cls_lst = (["BaseModel", "User", "Place",
                     "State", "City", "Amenity", "Review"])
-        if line == "":
+        if not line_arg:
             for obj in models.storage.all().values():
                 str_lst.append(str(obj))
             print(str_lst)
-        elif line not in cls_lst:
+        elif line_arg[0] in cls_lst:
+            for obj in models.storage.all().values():
+                if obj.__class__.__name__ == line_arg[0]:
+                    str_lst.append(str(obj))
+            print(str_lst)
+        else:
             print("** class doesn't exist **")
 
     def do_update(self, line) -> None:
