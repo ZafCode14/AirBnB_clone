@@ -122,12 +122,6 @@ class TestCommands(unittest.TestCase):
                 for item in json.loads(f.getvalue()):
                     self.assertEqual(item.split()[0], "[{}]".format(cls))
 
-            with patch('sys.stdout', new=StringIO()) as f:
-                HBNBCommand().onecmd(
-                        HBNBCommand().precmd("{}.all()".format(cls)))
-                for item in json.loads(f.getvalue()):
-                    self.assertEqual(item.split()[0], "[{}]".format(cls))
-
     def test_show(self):
         """Test 'show' with all classes"""
         for cls in self.classes:
@@ -140,17 +134,6 @@ class TestCommands(unittest.TestCase):
                         "[{}] ({}) {}".format(
                             cls, instance.id, instance.__dict__))
 
-            with patch('sys.stdout', new=StringIO()) as f:
-                instance = globals()[cls]()
-                instance.name = "Mike"
-                HBNBCommand().onecmd(
-                        HBNBCommand().precmd(
-                            '{}.show("{}")'.format(cls, instance.id)))
-                self.assertEqual(
-                        f.getvalue().strip(),
-                        "[{}] ({}) {}".format(
-                            cls, instance.id, instance.__dict__))
-
     def test_destroy(self):
         """Test 'destroy' with all classes"""
         for cls in self.classes:
@@ -158,15 +141,6 @@ class TestCommands(unittest.TestCase):
                 instance = globals()[cls]()
                 instance.name = "Mike"
                 HBNBCommand().onecmd("destroy {} {}".format(cls, instance.id))
-                self.assertNotIn(
-                        "{}.{}".format(cls, instance.id), storage.all().keys())
-
-            with patch('sys.stdout', new=StringIO()) as f:
-                instance = globals()[cls]()
-                instance.name = "Mike"
-                HBNBCommand().onecmd(
-                        HBNBCommand().precmd(
-                            '{}.destroy("{}")'.format(cls, instance.id)))
                 self.assertNotIn(
                         "{}.{}".format(cls, instance.id), storage.all().keys())
 
@@ -198,6 +172,65 @@ class TestCommands(unittest.TestCase):
                         instance.__dict__["description"], "Happy, lovely")
                 self.assertEqual(instance.__dict__["pet"], "dog")
                 self.assertNotIn("dog_name", dir(instance))
+
+
+class TestCommandsDot(unittest.TestCase):
+    """Testing commands."""
+
+    def setUp(self):
+        self.classes = [
+                "BaseModel", "User", "Place",
+                "State", "City", "Amenity", "Review"]
+
+    def tearDown(self) -> None:
+        """Resets FileStorage data."""
+        storage._FileStorage__objects = {}
+        if os.path.exists(storage._FileStorage__file_path):
+            os.remove(storage._FileStorage__file_path)
+
+    def test_all(self):
+        """Tests 'all' with all classes"""
+        for cls in self.classes:
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd(
+                        HBNBCommand().precmd("{}.all()".format(cls)))
+                for item in json.loads(f.getvalue()):
+                    self.assertEqual(item.split()[0], "[{}]".format(cls))
+
+    def test_show(self):
+        """Test 'show' with all classes"""
+        for cls in self.classes:
+            with patch('sys.stdout', new=StringIO()) as f:
+                instance = globals()[cls]()
+                instance.name = "Mike"
+                HBNBCommand().onecmd(
+                        HBNBCommand().precmd(
+                            '{}.show("{}")'.format(cls, instance.id)))
+                self.assertEqual(
+                        f.getvalue().strip(),
+                        "[{}] ({}) {}".format(
+                            cls, instance.id, instance.__dict__))
+
+    def test_destroy(self):
+        """Test 'destroy' with all classes"""
+        for cls in self.classes:
+            with patch('sys.stdout', new=StringIO()) as f:
+                instance = globals()[cls]()
+                instance.name = "Mike"
+                HBNBCommand().onecmd(
+                        HBNBCommand().precmd(
+                            '{}.destroy("{}")'.format(cls, instance.id)))
+                self.assertNotIn(
+                        "{}.{}".format(cls, instance.id), storage.all().keys())
+
+    def test_update(self):
+        """Test 'update' with all classes"""
+        for cls in self.classes:
+            with patch('sys.stdout', new=StringIO()) as f:
+                instance = globals()[cls]()
+                instance.name = "Halper"
+                instance.age = 23
+                instance.height = 1.98
                 HBNBCommand().onecmd(
                         HBNBCommand().precmd(
                             '{}.update("{}", "name", "Barter")'.format(
@@ -234,7 +267,6 @@ class TestCommands(unittest.TestCase):
                     if type(i) == BaseModel:
                         count += 1
                 self.assertEqual(int(f.getvalue()), count)
-
 
 if __name__ == '__main__':
     unittest.main()
