@@ -1,29 +1,89 @@
 #!/usr/bin/python3
-"""This module has unittest"""
+"""Module with a unittest"""
 import unittest
+import os
+import pep8
+from datetime import datetime
 from models.state import State
-from models.base_model import BaseModel
+from models import storage
+from models.engine.file_storage import FileStorage
+import json
 
 
-class TestState(unittest.TestCase):
-    """This class represets the tests for state"""
-    def setUp(self):
-        """This is the setUp method for the tests"""
-        self.state = State(name="California")
+class TestUser(unittest.TestCase):
+    """Class that represents the tests for model"""
+    def tearDown(self) -> None:
+        """Resets FileStorage data"""
+        FileStorage._FileStorage__objects = {}
+        if os.path.exists(FileStorage._FileStorage__file_path):
+            os.remove(FileStorage._FileStorage__file_path)
 
-    def test_state_attributes(self):
-        """This method tests the attribures"""
-        self.assertEqual(self.state.name, "California")
+    def test_style(self):
+        """Test style"""
+        style = pep8.StyleGuide(quiet=True)
+        p = style.check_files(['models/state.py'])
+        self.assertEqual(p.total_errors, 0, "Check pep8")
 
-    def test_attributes_type(self):
-        """This method tests for attribute types"""
-        self.assertIsInstance(self.state.name, str)
+    def test_init(self):
+        """test initializing method"""
+        obj = State()
+        self.assertTrue(hasattr(obj, "id"))
+        self.assertTrue(hasattr(obj, "created_at"))
+        self.assertTrue(hasattr(obj, "updated_at"))
+        self.assertIsInstance(obj.id, str)
+        self.assertIsInstance(obj.created_at, datetime)
+        self.assertIsInstance(obj.updated_at, datetime)
 
-    def test_inheritance(self):
-        """Thsi method tests for attribute inheritance logic"""
-        self.assertIsInstance(self.state, State)
-        self.assertIsInstance(self.state, BaseModel)
+    def test_str(self):
+        """Test the string method"""
+        obj = State()
+        expected_str = "[State] ({}) {}".format(obj.id, obj.__dict__)
+        self.assertEqual(str(obj), expected_str)
+
+    def test_save(self):
+        """Test the save method"""
+        obj = State()
+        old_updated_at = obj.updated_at
+        obj.save()
+        new_updated_at = obj.updated_at
+        self.assertNotEqual(old_updated_at, new_updated_at)
+
+    def test_to_dict(self):
+        """Test the dict method"""
+        obj = State()
+        obj_dict = obj.to_dict()
+        self.assertTrue(isinstance(obj_dict, dict))
+        self.assertEqual(obj_dict["id"], obj.id)
+        self.assertEqual(obj_dict["created_at"], obj.created_at.isoformat())
+        self.assertEqual(obj_dict["updated_at"], obj.updated_at.isoformat())
+        self.assertEqual(obj_dict["__class__"], "State")
+
+    def test_to_dict_with_custom_attributes(self):
+        """Test the dict method with custom attributes"""
+        obj = State()
+        obj.name = "Alice"
+        obj.age = 30
+        obj_dict = obj.to_dict()
+        self.assertTrue(isinstance(obj_dict, dict))
+        self.assertEqual(obj_dict["name"], "Alice")
+        self.assertEqual(obj_dict["age"], 30)
+
+    def test_init_with_kwargs(self):
+        """Test init with a dictionary passed"""
+        data = {
+            "id": "12345",
+            "created_at": "2023-11-07T12:34:56.789012",
+            "updated_at": "2023-11-08T01:23:45.678901",
+            "custom_attr": "value"
+        }
+        obj = State(**data)
+        self.assertEqual(obj.id, "12345")
+        self.assertEqual(
+                obj.created_at.isoformat(), "2023-11-07T12:34:56.789012")
+        self.assertEqual(
+                obj.updated_at.isoformat(), "2023-11-08T01:23:45.678901")
+        self.assertEqual(obj.custom_attr, "value")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
