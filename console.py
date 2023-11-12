@@ -14,6 +14,7 @@ from models.amenity import Amenity
 from models.review import Review
 import models
 
+
 class HBNBCommand(cmd.Cmd):
     """ Entry point of the command interpreter """
     prompt = "(hbnb) "
@@ -21,13 +22,14 @@ class HBNBCommand(cmd.Cmd):
     def do_quit(self, line: str) -> True:
         """ Quit command to exit the program. """
         return True
-    
+
     def emptyline(self) -> bool:
         return False
-    
+
     def do_create(self, line) -> None:
-        """ Creates instance of BaseModel, saves it to the JSON file """
-        lst_cls = ["BaseModel", "User", "Place", "State", "City", "Amenity", "Review"]
+        """ Creates instance save it to the JSON file """
+        lst_cls = (["BaseModel", "User", "Place",
+                    "State", "City", "Amenity", "Review"])
         if line == "":
             print("** class name missing **")
         elif line in lst_cls:
@@ -40,7 +42,8 @@ class HBNBCommand(cmd.Cmd):
     def do_show(self, line) -> None:
         """ Prints the string representation of an instance """
         flag = False
-        lst_cls = ["BaseModel", "User", "Place", "State", "City", "Amenity", "Review"]
+        lst_cls = (["BaseModel", "User", "Place",
+                    "State", "City", "Amenity", "Review"])
         command_list = line.split()
         if line == "" and len(command_list) == 0:
             print("** class name missing **")
@@ -61,7 +64,8 @@ class HBNBCommand(cmd.Cmd):
         """ Deletes an instance based on the class name and id """
         flag = True
         lst_command = line.split()
-        cls_lst = ["BaseModel", "User", "Place", "State", "City", "Amenity", "Review"]
+        cls_lst = (["BaseModel", "User", "Place",
+                    "State", "City", "Amenity", "Review"])
         if line == "" and len(lst_command) == 0:
             print("** class name missing **")
         elif len(lst_command) == 1 and lst_command[0] not in cls_lst:
@@ -78,7 +82,8 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, line) -> None:
         """ Prints all string representation of all instances """
         str_lst = []
-        cls_lst = ["BaseModel", "User", "Place", "State", "City", "Amenity", "Review"]
+        cls_lst = (["BaseModel", "User", "Place",
+                    "State", "City", "Amenity", "Review"])
         if line == "":
             for obj in models.storage.all().values():
                 str_lst.append(obj.__str__())
@@ -90,7 +95,8 @@ class HBNBCommand(cmd.Cmd):
         """ Updates an instance by adding or updating attribute """
         flag = False
         words_lst = line.split()
-        cls_lst = ["BaseModel", "User", "Place", "State", "City", "Amenity", "Review"]
+        cls_lst = (["BaseModel", "User", "Place",
+                    "State", "City", "Amenity", "Review"])
         if len(words_lst) >= 2:
             key_word = "{}.{}".format(words_lst[0], words_lst[1])
             for k in models.storage.all().keys():
@@ -116,5 +122,7 @@ class HBNBCommand(cmd.Cmd):
     # Aliasing
     do_EOF = do_quit
 
+
 if __name__ == '__main__':
+
     HBNBCommand().cmdloop()
