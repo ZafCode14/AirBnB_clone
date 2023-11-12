@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 
-    class FileStorage serializes/deserializes 
+    class FileStorage serializes/deserializes
 
 """
 import json
@@ -16,14 +16,14 @@ from models.review import Review
 
 
 class FileStorage:
-    """ Serializes instances to a JSON file and deserializes JSON file to instances """
+    """ Instances Serializes/deserializes from/to JSON file """
     __file_path = "file.json"
     __objects = {}
 
     def all(self) -> dict:
         """ Returns the dictionary __objects """
         return FileStorage.__objects
-    
+
     def new(self, obj) -> None:
         """ Sets in __objects the obj with key <obj class name>.id """
         cls_name = obj.__class__.__name__
@@ -31,10 +31,11 @@ class FileStorage:
 
     def save(self) -> None:
         """ Serializes __objects to the JSON file (path: __file_path """
-        objects_with_dict = {k: v.to_dict()for k, v in FileStorage.__objects.items()}
+        objects_with_dict = ({k: v.to_dict()
+                              for k, v in FileStorage.__objects.items()})
         with open(FileStorage.__file_path, "w", encoding="UTF-8") as f:
             f.write(json.dumps(objects_with_dict))
-    
+
     def reload(self) -> None:
         """ Deserializes the JSON file to __objects """
         if os.path.isfile(FileStorage.__file_path):
