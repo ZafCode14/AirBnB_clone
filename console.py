@@ -97,34 +97,46 @@ class HBNBCommand(cmd.Cmd):
         else:
             print("** class doesn't exist **")
 
-    def do_update(self, line) -> None:
-        """ Updates an instance by adding or updating attribute """
-        flag = False
-        words_lst = line.split()
-        cls_lst = (["BaseModel", "User", "Place",
-                    "State", "City", "Amenity", "Review"])
-        if len(words_lst) >= 2:
-            key_word = "{}.{}".format(words_lst[0], words_lst[1])
-            for k in models.storage.all().keys():
-                if k == key_word:
-                    flag = True
-        if len(words_lst) == 0:
-            print("** class name missing **")
-        elif words_lst[0] not in cls_lst:
-            print("** class doesn't exist **")
-        elif len(words_lst) < 2:
-            print("** instance id missing **")
-        elif not flag:
-            print("** no instance found **")
-        elif len(words_lst) < 3 and flag:
-            print("** attribute name missing **")
-        elif len(words_lst) < 4 and flag:
-            print("** value missing **")
-        elif len(words_lst) >= 4:
-            for k, v in models.storage.all().items():
-                if k == key_word:
-                    setattr(v, words_lst[2], words_lst[3])
+    def do_update(self, line):
+            """Updates an instance based on the class name and id."""
+            args = []
+            in_quotes = False
+            current_arg = ""
+            cls_lst = (["BaseModel", "User", "Place",
+                        "State", "City", "Amenity", "Review"])
 
+            for char in line:
+                if char == ' ' and not in_quotes:
+                    args.append(current_arg)
+                    current_arg = ""
+                elif char == '"':
+                    in_quotes = not in_quotes
+                else:
+                    current_arg += char
+
+            if current_arg:
+                args.append(current_arg)
+
+            if len(args) < 1:
+                print("* class name missing *")
+            elif not args[0] in cls_lst:
+                return
+            elif len(args) < 2:
+                print("* instance id missing *")
+            elif len(args) < 3:
+                print("* attribute name missing *")
+            elif len(args) < 4:
+                print("* value missing *")
+            else:
+                obj_key = "{}.{}".format(args[0], args[1])
+                if obj_key in models.storage.all():
+                    instance = models.storage.all()[obj_key]
+                    attribute_name = args[2]
+                    value = args[3]
+                    setattr(instance, attribute_name, value)
+                    models.storage.save()
+                else:
+                    print("* no instance found *")
     # Aliasing
     do_EOF = do_quit
 
