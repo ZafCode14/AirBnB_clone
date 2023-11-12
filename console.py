@@ -86,7 +86,7 @@ class HBNBCommand(cmd.Cmd):
                     "State", "City", "Amenity", "Review"])
         if line == "":
             for obj in models.storage.all().values():
-                str_lst.append(obj.__str__())
+                str_lst.append(str(obj))
             print(str_lst)
         elif line not in cls_lst:
             print("** class doesn't exist **")
