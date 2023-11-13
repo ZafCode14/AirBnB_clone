@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Module with a unittest"""
 import unittest
+import pep8
 from unittest.mock import patch
 from io import StringIO
 from console import HBNBCommand
@@ -24,6 +25,12 @@ class TestConsole(unittest.TestCase):
         storage._FileStorage__objects = {}
         if os.path.exists(storage._FileStorage__file_path):
             os.remove(storage._FileStorage__file_path)
+
+    def test_style(self):
+        """Test style"""
+        style = pep8.StyleGuide(quiet=True)
+        p = style.check_files(['console.py'])
+        self.assertEqual(p.total_errors, 0, "Check pep8")
 
     def test_basic_commands(self):
         """Tests basic commands."""
