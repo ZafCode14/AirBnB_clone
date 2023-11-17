@@ -48,12 +48,12 @@ button:hover {
 }
 .filters h3 {
     font-weight: 600;
-    margin-left: 5vw;
+    margin-left: 3vw;
 }
 .filters h4 {
     font-weight: 400;
     font-size: 14px;
-    margin-left: 5vw;
+    margin-left: 3vw;
 }
 .popover {
     display: none;
@@ -74,6 +74,21 @@ ul {
 .popover h2 {
     font-size: 16px;
     margin-left: 3vw;
+}
+@media (max-width: 400px) {
+    button {
+        width: 90px;
+        right: 10px;
+    }
+    .filters .locations, .filters .amenities {
+        width: 30%;
+    }
+    .popover {
+        width: 30%;
+    }
+    .popover h2 {
+        margin-left: 1vw;        
+    }
 }
 .cal {
     margin-top: 30px;
